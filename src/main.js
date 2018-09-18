@@ -1,17 +1,18 @@
-const gitCmd = require('./gitCmd.js');
-const changelog = require('./changelog.js');
 const path = require('path');
 const fs = require('fs');
+const signale = require('signale');
+const gitCmd = require('./gitCmd.js');
+const changelog = require('./changelog.js');
 
 module.exports = async (config = {}) => {
 
     if (!config.path) {
-        console.error('[check]', 'source path is required, pls update conf/config.js.');
+        signale.error('source path is required, pls update conf/config.js.');
         process.exit(1);
     } else {
         const source = path.resolve(config.path);
         if (!fs.existsSync(source)) {
-            console.error('[check]', `source path (${config.path}) doesnot exist, please check again.`);
+            signale.error(`source path (${config.path}) doesnot exist, please check again.`);
             process.exit(1);
         } else {
             config.path = source;
@@ -22,7 +23,7 @@ module.exports = async (config = {}) => {
         global.commitHref = config.commitHref;
     } else {
         const url = await gitCmd(config.path, ['ls-remote', '--get-url']).catch(err => {
-            console.error('[git]', `fetch git info fail by code : ${err}`);
+            signale.error(`fetch git info fail by code : ${err}`);
             process.exit(1);
         });
         global.commitHref = config.commitHref = url.replace('.git', '/commit/');
@@ -33,25 +34,25 @@ module.exports = async (config = {}) => {
         }
     }
 
-    console.log('[gitTags]', `fetch the tags from project:${config.path}`);
+    signale.star(`fetch the tags from project:${config.path}`);
 
     const splitStr = '_**_';
 
     const trimStr = await gitCmd(config.path, ['log', '--tags', '--no-walk', `--pretty="%ai${splitStr}%h${splitStr}%D"`]).catch(err => {
-        console.error('[gitTags]', `fetch git tag fail by code : ${err}`);
+        signale.error(`fetch git tag fail by code : ${err}`);
         process.exit(1);
     });
 
     const tagSplitStr = 'tag: ';
 
     if (!trimStr) {
-        console.error('[git]', 'empty tags info.');
+        signale.error('empty tags info.');
         process.exit(1);
     }
 
     const list = trimStr.split('\n');
 
-    console.log('[parseTag]', `tag list result(${list.length}): ${JSON.stringify(list, null, 4)}`);
+    signale.debug(`tag list result(${list.length}): ${JSON.stringify(list, null, 4)}`);
 
     let tags = [];
     for (let i = 0; i < list.length; i++) {
@@ -97,19 +98,21 @@ module.exports = async (config = {}) => {
     const tagsLen = tags.length;
 
     if (tagsLen === 1) {
-        console.log('project does not have any tag');
+        signale.success('project does not have any tag');
         process.exit(0);
         return;
     }
 
-    console.log('[index]', `fetch the changelog for tags(${tagsLen})`);
+    signale.star(`fetch the changelog for tags(${tagsLen})`);
     const result = [];
     for (let i = 0; i < tagsLen - 1; i++) {
-        console.log('[changelog]', `start: ${tags[i].name} - ${tags[i + 1].name}`);
+        signale.watch(`start: ${tags[i].name} - ${tags[i + 1].name}`);
         result.push([tags[i + 1], await changelog(config.path, tags[i].name + '..' + tags[i + 1].name).then(d => d).catch(() => '')]);
     }
 
-    console.log('[index]', 'format the changelog for tags:');
+    signale.complete('finish changelog');
+
+    signale.star('format the changelog for tags:');
 
     const changeLogs = result.reverse();
 
@@ -128,7 +131,7 @@ module.exports = async (config = {}) => {
     }
     fs.writeFileSync(file, `${mdContent}`);
 
-    console.log('[index]', 'finish');
+    signale.success('finish');
 };
 
 const dateFormat = d => {
