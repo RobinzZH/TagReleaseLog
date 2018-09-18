@@ -1,0 +1,92 @@
+<% 
+
+var groupCommits = {
+	bugfix:[],
+	features: [],
+	refactoring: [],
+	commits: []
+};
+
+
+commits.forEach(function (commit) {
+
+	var result = (commit.title).match(/^(\w*)(\((.*)\))?\: (.*)$/);
+
+	var type = result && result[1];
+	var scope = result && result[3];
+	var title = result && result[4];
+
+	if(type == 'fix' || type == 'fixed'){
+		groupCommits.bugfix.push({
+			type: type,
+			scope: scope,
+			title: title,
+			commit: commit
+		})
+	} else if(type == 'feat' || type == 'feature'){
+		groupCommits.features.push({
+			type: type,
+			scope: scope,
+			title: title,
+			commit: commit
+		})
+	} else if(type == 'refactor' || type == 'chore'){
+		groupCommits.refactoring.push({
+			type: type,
+			scope: scope,
+			title: title,
+			commit: commit
+		})
+	} else {
+		groupCommits.commits.push({
+			type: type,
+			scope: scope,
+			title: title,
+			commit: commit
+		})
+	}
+});
+
+
+var listCommits = function(list, key){
+
+	list.forEach(function (ct) { 
+
+	var type = ct.type;
+	var scope = ct.scope;
+	var title = '';
+	var commit = ct.commit;
+
+	if(type){
+		if(key != 'commits'){
+			title = (scope? '__'+scope+'__: ':'') + ct.title; 
+		}else{
+			title = '__' + type + (scope? '('+scope+')':'') + '__ : ' + ct.title;
+		}		
+	}else{
+		title = commit.title;
+	}
+%> - <% if(typeof commitHref === 'undefined' || commitHref === '') { %>[```<%=commit.sha1%>```]<% } else { %>[[```<%=commit.sha1%>```](<%=commitHref%><%=commit.sha1%>)]<%}%> __-__ <%=title%> (<%= commit.authorName %>)
+<% })} 
+
+
+for(var i in groupCommits){
+	if(groupCommits[i].length == 0) continue;
+	if(i=='bugfix'){ %>
+### Bug fixes
+	
+<%	}else if( i == 'features'){ %>
+
+### Features
+
+<%	}else if(i == 'refactoring'){ %>
+
+### Code Refactoring
+
+<%	}else{ %>
+
+### Other commits
+
+<%	} 
+listCommits(groupCommits[i], i);
+} %>
