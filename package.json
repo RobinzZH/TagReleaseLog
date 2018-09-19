@@ -1,9 +1,18 @@
 {
     "name": "tagchanges",
-    "version": "1.1.0",
+    "version": "1.1.1",
+    "license": "MIT",
     "description": "Tag release tool",
     "main": "cli.js",
     "author": "RobinzZH",
+    "keywords": [
+        "git",
+        "log",
+        "release notes",
+        "compare",
+        "version",
+        "tag"
+    ],
     "scripts": {
         "lint": "eslint examples src test --fix",
         "precommit": "lint-staged",
@@ -15,10 +24,11 @@
         "type": "git",
         "url": "https://github.com/RobinzZH/TagReleaseLog.git"
     },
+    "homepage": "https://github.com/RobinzZH/TagReleaseLog",
     "dependencies": {
         "commander": "^2.17.1",
         "signale": "^1.2.1",
-        "@redshelf/git-release-notes": "github:RobinzZH/git-release-notes"
+        "git-release-notes": "github:RobinzZH/git-release-notes"
     },
     "devDependencies": {
         "@commitlint/cli": "^6.2.0",

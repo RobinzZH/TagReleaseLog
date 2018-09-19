@@ -62,3 +62,6 @@ typings/
 
 # tmp files
 /result
+
+# webstorem
+.idea
