@@ -1,5 +1,5 @@
 const fs = require('fs');
-const releaseNotes = require('@redshelf/git-release-notes');
+const releaseNotes = require('git-release-notes');
 const TEMPLATE = `${__dirname}/markdown.ejs`;
 const signale = require('signale');
 
