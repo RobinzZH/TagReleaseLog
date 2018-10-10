@@ -4,9 +4,9 @@ Generate release log between tags to `changeLog.md`.
 
 Each tag's changelogs will be saved @ `/trlog`
 
-
 # program
 
+```js
 Usage: tagchanges [options] [command]
 
 Options:
@@ -22,6 +22,7 @@ Options:
 Commands:
 
   gen                            generate changelogs
+```
 
 # Getting started
 
