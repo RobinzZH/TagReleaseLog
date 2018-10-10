@@ -19,6 +19,14 @@ module.exports = async (config = {}) => {
         }
     }
 
+    if (config.LogFile) {
+        const folder = path.resolve(config.LogFile, '../');
+        if (!fs.existsSync(folder)) {
+            signale.error(`changelog folder (${folder}) doesnot exist, please check again.`);
+            process.exit(1);
+        }
+    }
+
     if (config.commitHref && config.tagHref) {
         global.commitHref = config.commitHref;
     } else {
@@ -107,7 +115,7 @@ module.exports = async (config = {}) => {
     const result = [];
     for (let i = 0; i < tagsLen - 1; i++) {
         signale.watch(`start: ${tags[i].name} - ${tags[i + 1].name}`);
-        result.push([tags[i + 1], await changelog(config.path, tags[i].name + '..' + tags[i + 1].name).then(d => d).catch(() => '')]);
+        result.push([tags[i + 1], await changelog(config.path, tags[i].name + '..' + tags[i + 1].name, config.genEachLog).then(d => d).catch(() => '')]);
     }
 
     signale.complete('finish changelog');
@@ -115,8 +123,6 @@ module.exports = async (config = {}) => {
     signale.star('format the changelog for tags:');
 
     const changeLogs = result.reverse();
-
-    const file = path.join(config.path, './changeLog.md');
 
     let mdContent = '# ChangeLog\n\n';
 
@@ -129,7 +135,7 @@ module.exports = async (config = {}) => {
             }
         }
     }
-    fs.writeFileSync(file, `${mdContent}`);
+    fs.writeFileSync(config.LogFile, `${mdContent}`);
 
     signale.success('finish');
 };

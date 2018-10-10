@@ -3,11 +3,11 @@ const releaseNotes = require('@redshelf/git-release-notes');
 const TEMPLATE = `${__dirname}/markdown.ejs`;
 const signale = require('signale');
 
-module.exports = (path, RANGE) => {
+module.exports = (path, RANGE, genEachLog) => {
 
-    signale.note('start create result folder');
-    mkdir('./result');
-    signale.note('finish create result folder');
+    signale.note('start create result<trlog> folder');
+    genEachLog && mkdir('./trlog');
+    signale.note('finish create result<trlog> folder');
 
     return new Promise((resolve, reject) => {
         releaseNotes({
@@ -15,7 +15,7 @@ module.exports = (path, RANGE) => {
         }, RANGE, TEMPLATE)
             .then((changelog) => {
                 signale.complete(`Changelog finished between ${RANGE}\n`);
-                fs.writeFileSync(`./result/changelog-${RANGE}.md`, `${changelog}`);
+                genEachLog && fs.writeFileSync(`./trlog/changelog-${RANGE}.md`, `${changelog}`);
                 resolve(changelog);
             })
             .catch((ex) => {
