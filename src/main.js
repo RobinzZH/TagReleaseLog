@@ -17,7 +17,7 @@ module.exports = async (config = {}) => {
         }
     }
 
-    if (config.LogFile) {
+    if (config.save && config.LogFile) {
         const folder = path.resolve(config.LogFile, '../');
         if (!fs.existsSync(folder)) {
             throw new Error(`changelog folder (${folder}) doesnot exist, please check again.`);
