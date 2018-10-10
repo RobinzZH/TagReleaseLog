@@ -3,7 +3,7 @@
 const program = require('commander');
 const path = require('path');
 const signale = require('signale');
-const main = require('./src/main.js');
+const mainFn = require('./src/main.js');
 const cwd = process.cwd();
 const {
     version
@@ -11,18 +11,19 @@ const {
 
 program.version(version);
 
-program.option('-s, --source <source>', 'Path for source code');
+program.option('-o, --only', 'Print only');
+program.option('-r, --repository <repository>', 'Path for repository');
 program.option('-h, --head', 'Enable changelog from HEAD');
-program.option('-p, --path <path>', 'Path for changelog.md(default to root of source code), e.g. xxx.md');
+program.option('-p, --path <path>', 'Path for changelog.md(default to root of repository), e.g. xxx.md');
 program.option('-l, --list', 'List the changelog between tags');
 
 program.parse(process.argv);
 
-let source = cwd;
+let repository = cwd;
 let logFile = cwd;
 
-if (program.source) {
-    source = path.resolve(cwd, program.source);
+if (program.repository) {
+    repository = path.resolve(cwd, program.repository);
 }
 
 if (program.path) {
@@ -37,14 +38,29 @@ if (program.path) {
         logFile = path.join(logFile, './changeLog.md');
     }
 } else {
-    logFile = path.resolve(source, './changeLog.md');
+    logFile = path.resolve(repository, './changeLog.md');
 }
 
-signale.note(`Generate change @Folder: ${source}`);
+signale.note(`Generate change @Folder: ${repository}`);
 
-main({
-    path: source,
+mainFn({
+    save: !program.only,
+    path: repository,
     LogFile: logFile,
     appendHEAD: program.head,
     genEachLog: program.list
+}).then(result => {
+    if (program.only) {
+        console.log('========================================================');
+        console.log(result);
+        console.log('========================================================');
+    }
+    process.exit(0);
+}).catch(err => {
+    if (err.message) {
+        signale.error(err.message);
+    } else {
+        signale.error(err);
+    }
+    process.exit(1);
 });

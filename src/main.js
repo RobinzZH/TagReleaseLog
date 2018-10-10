@@ -7,13 +7,11 @@ const changelog = require('./changelog.js');
 module.exports = async (config = {}) => {
 
     if (!config.path) {
-        signale.error('source path is required, pls update conf/config.js.');
-        process.exit(1);
+        throw new Error('source path is required, pls update conf/config.js.');
     } else {
         const source = path.resolve(config.path);
         if (!fs.existsSync(source)) {
-            signale.error(`source path (${config.path}) doesnot exist, please check again.`);
-            process.exit(1);
+            throw new Error(`source path (${config.path}) doesnot exist, please check again.`);
         } else {
             config.path = source;
         }
@@ -22,8 +20,7 @@ module.exports = async (config = {}) => {
     if (config.LogFile) {
         const folder = path.resolve(config.LogFile, '../');
         if (!fs.existsSync(folder)) {
-            signale.error(`changelog folder (${folder}) doesnot exist, please check again.`);
-            process.exit(1);
+            throw new Error(`changelog folder (${folder}) doesnot exist, please check again.`);
         }
     }
 
@@ -31,8 +28,7 @@ module.exports = async (config = {}) => {
         global.commitHref = config.commitHref;
     } else {
         const url = await gitCmd(config.path, ['ls-remote', '--get-url']).catch(err => {
-            signale.error(`fetch git info fail by code : ${err}`);
-            process.exit(1);
+            throw new Error(`fetch git info fail by code : ${err}`);
         });
         global.commitHref = config.commitHref = url.replace('.git', '/commit/');
         if (url.indexOf('github') >= 0) {
@@ -47,15 +43,13 @@ module.exports = async (config = {}) => {
     const splitStr = '_**_';
 
     const trimStr = await gitCmd(config.path, ['log', '--tags', '--no-walk', `--pretty="%ai${splitStr}%h${splitStr}%D"`]).catch(err => {
-        signale.error(`fetch git tag fail by code : ${err}`);
-        process.exit(1);
+        throw new Error(`fetch git tag fail by code : ${err}`);
     });
 
     const tagSplitStr = 'tag: ';
 
     if (!trimStr) {
-        signale.error('empty tags info.');
-        process.exit(1);
+        throw new Error('empty tags info.');
     }
 
     const list = trimStr.split('\n');
@@ -108,9 +102,7 @@ module.exports = async (config = {}) => {
     const tagsLen = tags.length;
 
     if (tagsLen === 0 || config.appendHEAD && tagsLen === 1) {
-        signale.success('project does not have any tag');
-        process.exit(0);
-        return;
+        throw new Error('project does not have any tag');
     }
 
     signale.star(`fetch the changelog for tags(${tagsLen})`);
@@ -137,9 +129,15 @@ module.exports = async (config = {}) => {
             }
         }
     }
-    fs.writeFileSync(config.LogFile, `${mdContent}`);
+
+    if (config.save) {
+        signale.star('write file');
+        fs.writeFileSync(config.LogFile, `${mdContent}`);
+    }
 
     signale.success('finish');
+
+    return mdContent;
 };
 
 const dateFormat = d => {
