@@ -1,6 +1,6 @@
 {
     "name": "tagchanges",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "license": "MIT",
     "description": "Tag release tool",
     "main": "cli.js",
