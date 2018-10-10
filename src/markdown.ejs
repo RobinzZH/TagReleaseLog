@@ -7,7 +7,6 @@ var groupCommits = {
 	commits: []
 };
 
-
 commits.forEach(function (commit) {
 
 	var result = (commit.title).match(/^(\w*)(\((.*)\))?\: (.*)$/);
@@ -66,7 +65,7 @@ var listCommits = function(list, key){
 	}else{
 		title = commit.title;
 	}
-%> - <% if(typeof commitHref === 'undefined' || commitHref === '') { %>[```<%=commit.sha1%>```]<% } else { %>[[```<%=commit.sha1%>```](<%=commitHref%><%=commit.sha1%>)]<%}%> __-__ <%=title%> (<%= commit.authorName %>)
+%> - <% if(typeof commitHref === 'undefined' || commitHref === '') { %>[```<%=commit.sha1.slice(0,8)%>```]<% } else { %>[[```<%=commit.sha1.slice(0,8)%>```](<%=commitHref%><%=commit.sha1%>)]<%}%> __-__ <%=title%> (<%= commit.authorName %>)
 <% })} 
 
 

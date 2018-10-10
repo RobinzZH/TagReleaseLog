@@ -27,8 +27,8 @@
     "homepage": "https://github.com/RobinzZH/TagReleaseLog",
     "dependencies": {
         "commander": "^2.17.1",
-        "signale": "^1.2.1",
-        "git-release-notes": "github:RobinzZH/git-release-notes"
+        "git-release-notes": "^3.0.0",
+        "signale": "^1.2.1"
     },
     "devDependencies": {
         "@commitlint/cli": "^6.2.0",
