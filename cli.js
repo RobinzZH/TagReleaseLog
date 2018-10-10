@@ -12,6 +12,7 @@ const {
 program.version(version);
 
 program.option('-s, --source <source>', 'Path for source code');
+program.option('-h, --head', 'Enable changelog from HEAD');
 program.option('-p, --path <path>', 'Path for changelog.md(default to root of source code), e.g. xxx.md');
 program.option('-l, --list', 'List the changelog between tags');
 
@@ -44,5 +45,6 @@ signale.note(`Generate change @Folder: ${source}`);
 main({
     path: source,
     LogFile: logFile,
+    appendHEAD: program.head,
     genEachLog: program.list
 });

@@ -97,15 +97,17 @@ module.exports = async (config = {}) => {
         return a.date.getTime() - b.date.getTime();
     });
 
-    tags = tags.concat({
-        date: new Date(),
-        hash: null,
-        name: 'HEAD'
-    });
+    if (config.appendHEAD) {
+        tags = tags.concat({
+            date: new Date(),
+            hash: null,
+            name: 'HEAD'
+        });
+    }
 
     const tagsLen = tags.length;
 
-    if (tagsLen === 1) {
+    if (tagsLen === 0 || config.appendHEAD && tagsLen === 1) {
         signale.success('project does not have any tag');
         process.exit(0);
         return;
